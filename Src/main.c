@@ -156,23 +156,23 @@ int main(void) {
 
 // Matlab Init
 // ###############################################################################
-  
-  /* Set BLDC controller parameters */ 
+
+  /* Set BLDC controller parameters */
   rtP_Right                     = rtP_Left;     // Copy the Left motor parameters to the Right motor parameters
 
   rtP_Left.b_selPhaABCurrMeas   = 1;            // Left motor measured current phases = {iA, iB} -> do NOT change
   rtP_Left.z_ctrlTypSel         = CTRL_TYP_SEL;
-  rtP_Left.b_diagEna            = DIAG_ENA; 
-  rtP_Left.b_fieldWeakEna       = FIELD_WEAK_ENA; 
-  rtP_Left.i_max                = I_MOT_MAX; 
-  rtP_Left.n_max                = N_MOT_MAX; 
+  rtP_Left.b_diagEna            = DIAG_ENA;
+  rtP_Left.b_fieldWeakEna       = FIELD_WEAK_ENA;
+  rtP_Left.i_max                = I_MOT_MAX;
+  rtP_Left.n_max                = N_MOT_MAX;
 
   rtP_Right.b_selPhaABCurrMeas  = 0;            // Left motor measured current phases = {iB, iC} -> do NOT change
   rtP_Right.z_ctrlTypSel        = CTRL_TYP_SEL;
-  rtP_Right.b_diagEna           = DIAG_ENA; 
-  rtP_Right.b_fieldWeakEna      = FIELD_WEAK_ENA; 
-  rtP_Right.i_max               = I_MOT_MAX; 
-  rtP_Right.n_max               = N_MOT_MAX; 
+  rtP_Right.b_diagEna           = DIAG_ENA;
+  rtP_Right.b_fieldWeakEna      = FIELD_WEAK_ENA;
+  rtP_Right.i_max               = I_MOT_MAX;
+  rtP_Right.n_max               = N_MOT_MAX;
 
   /* Pack LEFT motor data into RTM */
   rtM_Left->defaultParam        = &rtP_Left;
@@ -269,17 +269,18 @@ int main(void) {
       // ADC values range: 0-4095, see ADC-calibration in config.h
       #ifdef ADC1_MID_POT
         cmd1 = CLAMP(adc_buffer.l_tx2 - ADC1_MID, 0, ADC1_MAX - ADC1_MID) * 1000 / (ADC1_MAX - ADC1_MID)
-              -CLAMP(ADC1_MID - adc_buffer.l_tx2, 0, ADC1_MID - ADC1_MIN) * 1000 / (ADC1_MID - ADC1_MIN); // ADC1        
+              -CLAMP(ADC1_MID - adc_buffer.l_tx2, 0, ADC1_MID - ADC1_MIN) * 1000 / (ADC1_MID - ADC1_MIN); // ADC1
       #else
         cmd1 = CLAMP(adc_buffer.l_tx2 - ADC1_MIN, 0, ADC1_MAX) * 1000 / ADC1_MAX;                         // ADC1
       #endif
 
       #ifdef ADC2_MID_POT
-        cmd2 = CLAMP(adc_buffer.l_rx2 - ADC2_MID, 0, ADC2_MAX - ADC2_MID) * 1000 / (ADC2_MAX - ADC2_MID) 
-              -CLAMP(ADC2_MID - adc_buffer.l_rx2, 0, ADC2_MID - ADC2_MIN) * 1000 / (ADC2_MID - ADC2_MIN); // ADC2        
+        cmd2 = CLAMP(adc_buffer.l_rx2 - ADC2_MID, 0, ADC2_MAX - ADC2_MID) * 1000 / (ADC2_MAX - ADC2_MID)
+              -CLAMP(ADC2_MID - adc_buffer.l_rx2, 0, ADC2_MID - ADC2_MIN) * 1000 / (ADC2_MID - ADC2_MIN); // ADC2
       #else
-        cmd2 = CLAMP(adc_buffer.l_rx2 - ADC2_MIN, 0, ADC2_MAX) * 1000 / ADC2_MAX;                         // ADC2
-      #endif  
+        // cmd2 = CLAMP(adc_buffer.l_rx2 - ADC2_MIN, 0, ADC2_MAX) * 1000 / ADC2_MAX;                         // ADC2
+        cmd2 = -CLAMP(adc_buffer.l_rx2 - ADC2_MIN, 0, ADC2_MAX) * 340 / ADC2_MAX + CLAMP(adc_buffer.l_tx2 - ADC1_MIN, 0, ADC1_MAX) * 1000 / ADC1_MAX;
+      #endif
 
       // use ADCs as button inputs:
       button1 = (uint8_t)(adc_buffer.l_tx2 > 2000);  // ADC1
@@ -311,7 +312,7 @@ int main(void) {
     filtLowPass16(steerRateFixdt >> 4, FILTER, &steerFixdt);
     filtLowPass16(speedRateFixdt >> 4, FILTER, &speedFixdt);
     steer = steerFixdt >> 4;  // convert fixed-point to integer
-    speed = speedFixdt >> 4;  // convert fixed-point to integer    
+    speed = speedFixdt >> 4;  // convert fixed-point to integer
 
     // ####### MIXER #######
     // speedR = CLAMP((int)(speed * SPEED_COEFFICIENT -  steer * STEER_COEFFICIENT), -1000, 1000);
@@ -460,12 +461,12 @@ void SystemClock_Config(void) {
   * Max:  2047.9375
   * Min: -2048
   * Res:  0.0625
-  * 
+  *
   * Inputs:       u     = int16
   * Outputs:      y     = fixdt(1,16,4)
   * Parameters:   coef  = fixdt(0,16,16) = [0,65535U]
-  * 
-  * Example: 
+  *
+  * Example:
   * If coef = 0.8 (in floating point), then coef = 0.8 * 2^16 = 52429 (in fixed-point)
   * filtLowPass16(u, 52429, &y);
   * yint = y >> 4; // the integer output is the fixed-point ouput shifted by 4 bits
@@ -474,7 +475,7 @@ void filtLowPass16(int16_t u, uint16_t coef, int16_t *y)
 {
   int32_t tmp;
 
-  tmp = (((int16_t)(u << 4) * coef) >> 16) + 
+  tmp = (((int16_t)(u << 4) * coef) >> 16) +
         (((int32_t)(65535U - coef) * (*y)) >> 16);
 
   // Overflow protection
@@ -488,12 +489,12 @@ void filtLowPass16(int16_t u, uint16_t coef, int16_t *y)
   * Max:  32767.99998474121
   * Min: -32768
   * Res:  1.52587890625e-5
-  * 
+  *
   * Inputs:       u     = int32
   * Outputs:      y     = fixdt(1,32,16)
   * Parameters:   coef  = fixdt(0,16,16) = [0,65535U]
-  * 
-  * Example: 
+  *
+  * Example:
   * If coef = 0.8 (in floating point), then coef = 0.8 * 2^16 = 52429 (in fixed-point)
   * filtLowPass16(u, 52429, &y);
   * yint = y >> 16;  // the integer output is the fixed-point ouput shifted by 16 bits
@@ -520,7 +521,7 @@ void filtLowPass32(int32_t u, uint16_t coef, int32_t *y)
 }
 
 // ===========================================================
-  /* mixerFcn(rtu_speed, rtu_steer, &rty_speedR, &rty_speedL); 
+  /* mixerFcn(rtu_speed, rtu_steer, &rty_speedR, &rty_speedL);
   * Inputs:       rtu_speed, rtu_steer                  = fixdt(1,16,4)
   * Outputs:      rty_speedR, rty_speedL                = int16_t
   * Parameters:   SPEED_COEFFICIENT, STEER_COEFFICIENT  = fixdt(0,16,14)
@@ -534,9 +535,9 @@ void mixerFcn(int16_t rtu_speed, int16_t rtu_steer, int16_t *rty_speedR, int16_t
   prodSpeed   = (int16_t)((rtu_speed * (int16_t)SPEED_COEFFICIENT) >> 14);
   prodSteer   = (int16_t)((rtu_steer * (int16_t)STEER_COEFFICIENT) >> 14);
 
-  tmp         = prodSpeed - prodSteer;  
+  tmp         = prodSpeed - prodSteer;
   tmp         = CLAMP(tmp, -32768, 32767);  // Overflow protection
-  *rty_speedR = (int16_t)(tmp >> 4);        // Convert from fixed-point to int 
+  *rty_speedR = (int16_t)(tmp >> 4);        // Convert from fixed-point to int
   *rty_speedR = CLAMP(*rty_speedR, -1000, 1000);
 
   tmp         = prodSpeed + prodSteer;

@@ -42,8 +42,8 @@
  * Then you can verify voltage on value 6 (to get calibrated voltage multiplied by 100).
  */
 #define BAT_FILT_COEF           655       // battery voltage filter coefficient in fixed-point. coef_fixedPoint = coef_floatingPoint * 2^16. In this case 655 = 0.01 * 2^16
-#define BAT_CALIB_REAL_VOLTAGE  4300      // input voltage measured by multimeter (multiplied by 100). In this case 43.00 V * 100 = 4300
-#define BAT_CALIB_ADC           1704      // adc-value measured by mainboard (value nr 5 on UART debug output)
+#define BAT_CALIB_REAL_VOLTAGE  4100      // input voltage measured by multimeter (multiplied by 100). In this case 43.00 V * 100 = 4300
+#define BAT_CALIB_ADC           1524      // adc-value measured by mainboard (value nr 5 on UART debug output)
 
 #define BAT_CELLS               10        // battery number of cells. Normal Hoverboard battery: 10s
 #define BAT_LOW_LVL1_ENABLE     0         // to beep or not to beep, 1 or 0
@@ -104,13 +104,13 @@
  * Make, flash and test it.
  */
 #define CONTROL_ADC           // use ADC as input. disable CONTROL_SERIAL_USART2!
-#define ADC1_MID_POT          // ADC1 middle resting poti: comment-out if NOT a middle resting poti
-#define ADC2_MID_POT          // ADC2 middle resting poti: comment-out if NOT a middle resting poti
+// #define ADC1_MID_POT          // ADC1 middle resting poti: comment-out if NOT a middle resting poti
+// #define ADC2_MID_POT          // ADC2 middle resting poti: comment-out if NOT a middle resting poti
 #define ADC1_MIN 0            // min ADC1-value while poti at minimum-position (0 - 4095)
-#define ADC1_MID 1963         // mid ADC1-value while poti at minimum-position (ADC1_MIN - ADC1_MAX)
+// #define ADC1_MID 1963         // mid ADC1-value while poti at minimum-position (ADC1_MIN - ADC1_MAX)
 #define ADC1_MAX 4095         // max ADC1-value while poti at maximum-position (0 - 4095)
 #define ADC2_MIN 0            // min ADC2-value while poti at minimum-position (0 - 4095)
-#define ADC2_MID 2006         // mid ADC2-value while poti at minimum-position (ADC2_MIN - ADC2_MAX)
+// #define ADC2_MID 2006         // mid ADC2-value while poti at minimum-position (ADC2_MIN - ADC2_MAX)
 #define ADC2_MAX 4095         // max ADC2-value while poti at maximum-position (0 - 4095)
 
 // ###### CONTROL VIA NINTENDO NUNCHUCK ######
@@ -154,7 +154,7 @@
  * - button1 and button2: digital input values. 0 or 1
  * - adc_buffer.l_tx2 and adc_buffer.l_rx2: unfiltered ADC values (you do not need them). 0 to 4095
  * Outputs:
- * - speedR and speedL: normal driving -1000 to 1000 
+ * - speedR and speedL: normal driving -1000 to 1000
  */
 
 // Value of RATE is in fixdt(1,16,4): VAL_fixedPoint = VAL_floatingPoint * 2^4. In this case 480 = 30 * 2^4
@@ -166,16 +166,16 @@
 // Value of COEFFICIENT is in fixdt(1,16,14)
 // If VAL_floatingPoint >= 0, VAL_fixedPoint = VAL_floatingPoint * 2^15
 // If VAL_floatingPoint < 0,  VAL_fixedPoint = 2^16 + floor(VAL_floatingPoint * 2^15).
-#define SPEED_COEFFICIENT   16384 // 1.0f [-] higher value == stronger. [0, 65535] = [-2.0 - 2.0]. In this case 16384 = 1.0 * 2^14 
-#define STEER_COEFFICIENT   8192  // 0.5f [-] higher value == stronger. [0, 65535] = [-2.0 - 2.0]. In this case  8192 = 0.5 * 2^15. If you do not want any steering, set it to 0. 
+#define SPEED_COEFFICIENT   16384 // 1.0f [-] higher value == stronger. [0, 65535] = [-2.0 - 2.0]. In this case 16384 = 1.0 * 2^14
+#define STEER_COEFFICIENT   0  // 0.5f [-] higher value == stronger. [0, 65535] = [-2.0 - 2.0]. In this case  8192 = 0.5 * 2^15. If you do not want any steering, set it to 0.
 
 #define INVERT_R_DIRECTION
 #define INVERT_L_DIRECTION
-#define BEEPS_BACKWARD      0     // 0 or 1
+#define BEEPS_BACKWARD      1     // 0 or 1
 
 // ###### SIMPLE BOBBYCAR ######
 // for better bobbycar code see: https://github.com/larsmm/hoverboard-firmware-hack-bbcar
-// #define FILTER             6553    //  0.1f 
+// #define FILTER             6553    //  0.1f
 // #define SPEED_COEFFICIENT  49152   // -1.0f
 // #define STEER_COEFFICIENT  0       //  0.0f
 
