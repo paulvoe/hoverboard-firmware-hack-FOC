@@ -158,7 +158,7 @@
  */
 
 // Value of RATE is in fixdt(1,16,4): VAL_fixedPoint = VAL_floatingPoint * 2^4. In this case 480 = 30 * 2^4
-#define RATE                480   // 30.0f [-] lower value == slower rate [0, 32767] = [0.0 - 2047.9375]. Do NOT make rate negative (>32767)
+#define RATE                80   // 30.0f [-] lower value == slower rate [0, 32767] = [0.0 - 2047.9375]. Do NOT make rate negative (>32767)
 
 // Value of FILTER is in fixdt(0,16,16): VAL_fixedPoint = VAL_floatingPoint * 2^16. In this case 6553 = 0.1 * 2^16
 #define FILTER              1000  // 0.1f [-] lower value == softer filter [0, 65535] = [0.0 - 1.0].
